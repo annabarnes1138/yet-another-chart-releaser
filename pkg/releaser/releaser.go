@@ -145,6 +145,15 @@ func (r *Releaser) UpdateIndexFile() (bool, error) {
 		return false, err
 	}
 
+	var worktree string
+	if r.config.Push || r.config.PR {
+		worktree, err := r.git.AddWorktree("", r.config.Remote+"/"+r.config.PagesBranch)
+		if err != nil {
+			return false, err
+		}
+		defer r.git.RemoveWorktree("", worktree) // nolint, errcheck
+	}
+
 	var update bool
 	for _, chartPackage := range chartPackages {
 		ch, err := loader.LoadFile(chartPackage)
@@ -175,13 +184,30 @@ func (r *Releaser) UpdateIndexFile() (bool, error) {
 			tagParts := r.splitPackageNameAndVersion(baseName)
 			packageName, packageVersion := tagParts[0], tagParts[1]
 			fmt.Printf("Found %s-%s.tgz\n", packageName, packageVersion)
-			if _, err := indexFile.Get(packageName, packageVersion); err != nil {
-				if err := r.addToIndexFile(indexFile, downloadUrl.String()); err != nil {
+			if _, err := indexFile.Get(packageName, packageVersion); err == nil {
+				continue
+			}
+
+			update = true
+			if r.config.PackagesWithIndex {
+				if err := r.addToIndexFile(indexFile, filepath.Base(chartPackage)); err != nil {
 					return false, err
 				}
-				update = true
+
+				packagePath := filepath.Join(worktree, "index.yaml")
+				if err := copyFile(chartPackage, packagePath); err != nil {
+					return false, err
+				}
+				if err := r.git.Add(worktree, packagePath); err != nil {
+					return false, err
+				}
 				break
 			}
+
+			if err := r.addToIndexFile(indexFile, downloadUrl.String()); err != nil {
+				return false, err
+			}
+			break
 		}
 	}
 
@@ -202,12 +228,6 @@ func (r *Releaser) UpdateIndexFile() (bool, error) {
 	if !r.config.Push && !r.config.PR {
 		return true, nil
 	}
-
-	worktree, err := r.git.AddWorktree("", r.config.Remote+"/"+r.config.PagesBranch)
-	if err != nil {
-		return false, err
-	}
-	defer r.git.RemoveWorktree("", worktree) // nolint, errcheck
 
 	indexYamlPath := filepath.Join(worktree, "index.yaml")
 	if err := copyFile(r.config.IndexPath, indexYamlPath); err != nil {
