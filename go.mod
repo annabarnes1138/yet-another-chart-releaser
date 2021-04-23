@@ -1,6 +1,6 @@
 module github.com/stecky/yet-another-chart-releaser
 
-go 1.16
+go 1.15
 
 require (
 	github.com/Songmu/retry v0.1.0
