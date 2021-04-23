@@ -55,3 +55,5 @@ jobs:
 
       - name: Release
         run: mage -v release
+        env:
+          GITHUB_TOKEN: "${{ secrets.GITHUB_TOKEN }}"
