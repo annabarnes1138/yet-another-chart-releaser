@@ -1,6 +1,6 @@
 project_name: yet-another-chart-releaser
 builds:
-  - main: main.go
+  - main: .
     binary: yacr
     env:
       - CGO_ENABLED=0
