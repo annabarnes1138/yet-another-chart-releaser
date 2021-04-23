@@ -52,7 +52,7 @@ brews:
       name: stecky
       email: stecky@users.noreply.github.com>
     folder: Formula
-    homepage: https://github.com/stecky/yacr/
+    homepage: https://github.com/stecky/yet-another-chart-releaser/
     description: Yet Another Helm Chart Releaser
     install: |
       bin.install "yacr"

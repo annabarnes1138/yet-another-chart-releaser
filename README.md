@@ -56,7 +56,7 @@ Download your preferred asset from the [releases page](https://github.com/stecky
 
 ```console
 $ brew tap stecky/tap
-$ brew install yacr
+$ brew install yet-another-chart-releaser
 ```
 
 ### Go get (for contributing)
@@ -64,7 +64,7 @@ $ brew install yacr
 ```console
 $ # clone repo to some directory outside GOPATH
 $ git clone https://github.com/stecky/yet-another-chart-releaser
-$ cd yacr
+$ cd yet-another-chart-releaser
 $ go mod download
 $ go install ./...
 ```
