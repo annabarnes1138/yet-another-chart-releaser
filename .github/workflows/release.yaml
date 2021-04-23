@@ -30,7 +30,7 @@ jobs:
             ${{ runner.os }}-go-
 
       - name: Install tools
-        run: ./scripts/setup.sh
+        run: ./setup.sh
 
       - name: Check License Headers
         run: mage -v checkLicenseHeaders
