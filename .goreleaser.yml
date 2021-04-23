@@ -1,0 +1,60 @@
+project_name: yet-another-chart-releaser
+builds:
+  - main: main.go
+    binary: yacr
+    env:
+      - CGO_ENABLED=0
+    goarch:
+      - amd64
+      - arm
+    goos:
+      - linux
+      - darwin
+      - windows
+    ldflags:
+      - >-
+        -X github.com/stecky/yacr/cmd.Version={{ .Tag }}
+        -X github.com/stecky/yacr/cmd.GitCommit={{ .Commit }}
+        -X github.com/stecky/yacr/cmd.BuildDate={{ .Date }}
+archives:
+  - format_overrides:
+      - goos: windows
+        format: zip
+    files:
+      - LICENSE
+      - README.md
+checksum:
+  name_template: 'checksums.txt'
+snapshot:
+  name_template: "{{ .Tag }}-next"
+dockers:
+  - goos: linux
+    goarch: amd64
+    binaries:
+      - yacr
+    skip_push: false
+    dockerfile: Dockerfile
+    image_templates:
+      - stecky/yacr:{{ .Tag }}
+      - stecky/yacr:latest
+    build_flag_templates:
+      - --label=org.label-schema.schema-version=1.0
+      - --label=org.label-schema.version={{ .Version }}
+      - --label=org.label-schema.name={{ .ProjectName }}
+      - --label=org.label-schema.build-date={{ .Date }}
+      - --label=org.label-schema.description='yacr - Yet Another Helm Chart Releaser'
+      - --label=org.label-schema.vendor=stecky
+brews:
+  - tap:
+      owner: stecky
+      name: homebrew-tap
+    commit_author:
+      name: stecky
+      email: stecky@users.noreply.github.com>
+    folder: Formula
+    homepage: https://github.com/stecky/yacr/
+    description: Yet Another Helm Chart Releaser
+    install: |
+      bin.install "yacr"
+    test: |
+      system "#{bin}/yacr --version"
