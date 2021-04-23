@@ -32,8 +32,8 @@ var (
 	homeDir, _            = homedir.Dir()
 	configSearchLocations = []string{
 		".",
-		filepath.Join(homeDir, ".cr"),
-		"/etc/cr",
+		filepath.Join(homeDir, ".yacr"),
+		"/etc/yacr",
 	}
 )
 
@@ -75,12 +75,12 @@ func LoadConfiguration(cfgFile string, cmd *cobra.Command, requiredFlags []strin
 
 	v.AutomaticEnv()
 	v.SetEnvKeyReplacer(strings.NewReplacer("-", "_"))
-	v.SetEnvPrefix("CR")
+	v.SetEnvPrefix("YACR")
 
 	if cfgFile != "" {
 		v.SetConfigFile(cfgFile)
 	} else {
-		v.SetConfigName("cr")
+		v.SetConfigName("yacr")
 		for _, searchLocation := range configSearchLocations {
 			v.AddConfigPath(searchLocation)
 		}

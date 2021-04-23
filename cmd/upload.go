@@ -46,7 +46,7 @@ func init() {
 	rootCmd.AddCommand(uploadCmd)
 	uploadCmd.Flags().StringP("owner", "o", "", "GitHub username or organization")
 	uploadCmd.Flags().StringP("git-repo", "r", "", "GitHub repository")
-	uploadCmd.Flags().StringP("package-path", "p", ".cr-release-packages", "Path to directory with chart packages")
+	uploadCmd.Flags().StringP("package-path", "p", ".yacr-release-packages", "Path to directory with chart packages")
 	uploadCmd.Flags().StringP("token", "t", "", "GitHub Auth Token")
 	uploadCmd.Flags().StringP("git-base-url", "b", "https://api.github.com/", "GitHub Base URL (only needed for private GitHub)")
 	uploadCmd.Flags().StringP("git-upload-url", "u", "https://uploads.github.com/", "GitHub Upload URL (only needed for private GitHub)")

@@ -177,6 +177,7 @@ Flags:
   -p, --package-path string            Path to directory with chart packages (default ".yacr-release-packages")
       --release-name-template string   Go template for computing release names, using chart metadata (default "{{ .Name }}-{{ .Version }}")
   -t, --token string                   GitHub Auth Token (only needed for private repos)
+  --packages-with-index                Save a copy of the package files to the GitHub pages branch and reference them in the index
 
 Global Flags:
       --config string   Config file (default is $HOME/.yacr.yaml)
@@ -186,7 +187,7 @@ Global Flags:
 
 `yacr` is a command-line application.
 All command-line flags can also be set via environment variables or config file.
-Environment variables must be prefixed with `CR_`.
+Environment variables must be prefixed with `YACR_`.
 Underscores must be used instead of hyphens.
 
 CLI flags, environment variables, and a config file can be mixed.
@@ -206,12 +207,12 @@ The following example show various ways of configuring the same thing:
 
 #### Environment Variables
 
-    export CR_OWNER=myaccount
-    export CR_GIT_REPO=helm-charts
-    export CR_PACKAGE_PATH=.deploy
-    export CR_TOKEN="123456789"
-    export CR_GIT_BASE_URL="https://api.github.com/"
-    export CR_GIT_UPLOAD_URL="https://uploads.github.com/"
+    export YACR_OWNER=myaccount
+    export YACR_GIT_REPO=helm-charts
+    export YACR_PACKAGE_PATH=.deploy
+    export YACR_TOKEN="123456789"
+    export YACR_GIT_BASE_URL="https://api.github.com/"
+    export YACR_GIT_UPLOAD_URL="https://uploads.github.com/"
 
     yacr upload
 
