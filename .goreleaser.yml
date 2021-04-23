@@ -30,7 +30,7 @@ snapshot:
 dockers:
   - goos: linux
     goarch: amd64
-    binaries:
+    ids:
       - yacr
     skip_push: false
     dockerfile: Dockerfile
