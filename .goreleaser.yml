@@ -50,7 +50,7 @@ brews:
       name: homebrew-tap
     commit_author:
       name: stecky
-      email: stecky@users.noreply.github.com>
+      email: stecky@users.noreply.github.com
     folder: Formula
     homepage: https://github.com/stecky/yet-another-chart-releaser/
     description: Yet Another Helm Chart Releaser
