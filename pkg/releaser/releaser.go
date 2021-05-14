@@ -194,10 +194,12 @@ func (r *Releaser) UpdateIndexFile() (bool, error) {
 					return false, err
 				}
 
-				packagePath := filepath.Join(worktree, "index.yaml")
+				packagePath := filepath.Join(worktree, filepath.Base(chartPackage))
+				fmt.Printf("Copying %s to %s", chartPackage, packagePath)
 				if err := copyFile(chartPackage, packagePath); err != nil {
 					return false, err
 				}
+				fmt.Printf("Adding %s to the worktree", filepath.Base(chartPackage))
 				if err := r.git.Add(worktree, packagePath); err != nil {
 					return false, err
 				}
