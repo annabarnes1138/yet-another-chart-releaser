@@ -151,6 +151,7 @@ func (r *Releaser) UpdateIndexFile() (bool, error) {
 		if err != nil {
 			return false, err
 		}
+		fmt.Printf("Created new worktree at %s\n", worktree)
 		defer r.git.RemoveWorktree("", worktree) // nolint, errcheck
 	}
 
@@ -195,11 +196,11 @@ func (r *Releaser) UpdateIndexFile() (bool, error) {
 				}
 
 				packagePath := filepath.Join(worktree, filepath.Base(chartPackage))
-				fmt.Printf("Copying %s to %s", chartPackage, packagePath)
+				fmt.Printf("Copying %s to %s\n", chartPackage, packagePath)
 				if err := copyFile(chartPackage, packagePath); err != nil {
 					return false, err
 				}
-				fmt.Printf("Adding %s to the worktree", filepath.Base(chartPackage))
+				fmt.Printf("Adding %s to the worktree\n", filepath.Base(chartPackage))
 				if err := r.git.Add(worktree, packagePath); err != nil {
 					return false, err
 				}
@@ -232,6 +233,7 @@ func (r *Releaser) UpdateIndexFile() (bool, error) {
 	}
 
 	indexYamlPath := filepath.Join(worktree, "index.yaml")
+	fmt.Printf("Copying index.yaml from %s to %s\n", r.config.IndexPath, indexYamlPath)
 	if err := copyFile(r.config.IndexPath, indexYamlPath); err != nil {
 		return false, err
 	}
