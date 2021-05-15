@@ -66,6 +66,7 @@ func (g *Git) Push(workingDir string, args ...string) error {
 	pushArgs := []string{"push"}
 	pushArgs = append(pushArgs, args...)
 	command := exec.Command("git", pushArgs...)
+	fmt.Printf("Executing command git %s", pushArgs)
 	return runCommand(workingDir, command)
 }
 
