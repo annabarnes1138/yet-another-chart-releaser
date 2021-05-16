@@ -19,7 +19,6 @@ import (
 	"context"
 	"fmt"
 	"io"
-	"io/ioutil"
 	"math/rand"
 	"net/http"
 	"net/url"
@@ -180,13 +179,6 @@ func (r *Releaser) UpdateIndexFile() (bool, error) {
 				if err := r.addToIndexFile(indexFile, downloadUrl.String()); err != nil {
 					return false, err
 				}
-				if r.config.PackagesWithIndex {
-					indexBasePath := filepath.Dir(r.config.IndexPath)
-					chartTargetPath := filepath.Join(indexBasePath, filepath.Base(chartPackage))
-					if err := copyFile(chartPackage, chartTargetPath); err != nil {
-						return false, err
-					}
-				}
 				update = true
 				break
 			}
@@ -217,24 +209,14 @@ func (r *Releaser) UpdateIndexFile() (bool, error) {
 	}
 	defer r.git.RemoveWorktree("", worktree) // nolint, errcheck
 
-	indexBasePath := filepath.Dir(r.config.IndexPath)
-	files, _ := ioutil.ReadDir(indexBasePath)
-	for _, file := range files {
-		oldFilePath := filepath.Join(indexBasePath, file.Name())
-		newFilePath := filepath.Join(worktree, file.Name())
-		if err := copyFile(oldFilePath, newFilePath); err != nil {
-			return false, err
-		}
-		if err := r.git.Add(worktree, newFilePath); err != nil {
-			return false, err
-		}
+	indexYamlPath := filepath.Join(worktree, "index.yaml")
+	if err := copyFile(r.config.IndexPath, indexYamlPath); err != nil {
+		return false, err
 	}
-
-	commitMsg := "Update index.yaml"
-	if r.config.PackagesWithIndex {
-		commitMsg = "Publishing chart"
+	if err := r.git.Add(worktree, indexYamlPath); err != nil {
+		return false, err
 	}
-	if err := r.git.Commit(worktree, commitMsg); err != nil {
+	if err := r.git.Commit(worktree, "Update index.yaml"); err != nil {
 		return false, err
 	}
 
@@ -308,8 +290,9 @@ func (r *Releaser) addToIndexFile(indexFile *repo.IndexFile, url string) error {
 	s := strings.Split(url, "/")
 	s = s[:len(s)-1]
 
-	// the chart will be stored in the same repo as the index file so let's make the path relative
 	if r.config.PackagesWithIndex {
+		// the chart will be stored in the same repo as
+		// the index file so let's make the path relative
 		s = s[:0]
 	}
 
@@ -361,6 +344,27 @@ func (r *Releaser) CreateReleases() error {
 		}
 		if err := r.github.CreateRelease(context.TODO(), release); err != nil {
 			return errors.Wrapf(err, "error creating GitHub release %s", releaseName)
+		}
+
+		if r.config.PackagesWithIndex {
+			worktree, err := r.git.AddWorktree("", r.config.Remote+"/"+r.config.PagesBranch)
+			if err != nil {
+				return err
+			}
+			defer r.git.RemoveWorktree("", worktree) // nolint, errcheck
+
+			pkgTargetPath := filepath.Join(worktree, filepath.Base(p))
+			if err := copyFile(p, pkgTargetPath); err != nil {
+				return err
+			}
+
+			if err := r.git.Add(worktree, pkgTargetPath); err != nil {
+				return err
+			}
+
+			if err := r.git.Commit(worktree, fmt.Sprintf("Publishing chart package for %s", releaseName)); err != nil {
+				return err
+			}
 		}
 	}
 

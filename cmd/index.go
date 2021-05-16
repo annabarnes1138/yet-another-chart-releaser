@@ -62,5 +62,5 @@ func init() {
 	flags.Bool("push", false, "Push index.yaml to the GitHub Pages branch (must not be set if --pr is set)")
 	flags.Bool("pr", false, "Create a pull request for index.yaml against the GitHub Pages branch (must not be set if --push is set)")
 	flags.String("release-name-template", "{{ .Name }}-{{ .Version }}", "Go template for computing release names, using chart metadata")
-	flags.Bool("packages-with-index", false, "Save a copy of the package files to the GitHub pages branch and reference them in the index")
+	flags.Bool("packages-with-index", false, "Override the download url to point to files in the GitHub Pages branch instead of the release assets")
 }
