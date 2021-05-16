@@ -53,5 +53,7 @@ func init() {
 	uploadCmd.Flags().StringP("commit", "c", "", "Target commit for release")
 	uploadCmd.Flags().Bool("skip-existing", false, "Skip upload if release exists")
 	uploadCmd.Flags().String("release-name-template", "{{ .Name }}-{{ .Version }}", "Go template for computing release names, using chart metadata")
+	uploadCmd.Flags().String("pages-branch", "gh-pages", "The GitHub pages branch")
+	uploadCmd.Flags().String("remote", "origin", "The Git remote used when creating a local worktree for the GitHub Pages branch")
 	uploadCmd.Flags().Bool("packages-with-index", false, "Save a copy of the package files to the GitHub Pages branch")
 }
