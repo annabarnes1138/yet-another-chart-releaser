@@ -220,29 +220,8 @@ func (r *Releaser) UpdateIndexFile() (bool, error) {
 		return false, err
 	}
 
-	pushURL, err := r.git.GetPushURL(r.config.Remote, r.config.Token)
-	if err != nil {
+	if err := r.pushToPagesBranch(worktree); err != nil {
 		return false, err
-	}
-
-	if r.config.Push {
-		fmt.Printf("Pushing to branch %q\n", r.config.PagesBranch)
-		if err := r.git.Push(worktree, pushURL, "HEAD:refs/heads/"+r.config.PagesBranch); err != nil {
-			return false, err
-		}
-	} else if r.config.PR {
-		branch := fmt.Sprintf("chart-releaser-%s", randomString(16))
-
-		fmt.Printf("Pushing to branch %q\n", branch)
-		if err := r.git.Push(worktree, pushURL, "HEAD:refs/heads/"+branch); err != nil {
-			return false, err
-		}
-		fmt.Printf("Creating pull request against branch %q\n", r.config.PagesBranch)
-		prURL, err := r.github.CreatePullRequest(r.config.Owner, r.config.GitRepo, "Update index.yaml", branch, r.config.PagesBranch)
-		if err != nil {
-			return false, err
-		}
-		fmt.Println("Pull request created:", prURL)
 	}
 
 	return true, nil
@@ -365,6 +344,10 @@ func (r *Releaser) CreateReleases() error {
 			if err := r.git.Commit(worktree, fmt.Sprintf("Publishing chart package for %s", releaseName)); err != nil {
 				return err
 			}
+
+			if err := r.pushToPagesBranch(worktree); err != nil {
+				return err
+			}
 		}
 	}
 
@@ -373,6 +356,35 @@ func (r *Releaser) CreateReleases() error {
 
 func (r *Releaser) getListOfPackages(dir string) ([]string, error) {
 	return filepath.Glob(filepath.Join(dir, "*.tgz"))
+}
+
+func (r *Releaser) pushToPagesBranch(worktree string) error {
+	pushURL, err := r.git.GetPushURL(r.config.Remote, r.config.Token)
+	if err != nil {
+		return err
+	}
+
+	if r.config.Push {
+		fmt.Printf("Pushing to branch %q\n", r.config.PagesBranch)
+		if err := r.git.Push(worktree, pushURL, "HEAD:refs/heads/"+r.config.PagesBranch); err != nil {
+			return err
+		}
+	} else if r.config.PR {
+		branch := fmt.Sprintf("chart-releaser-%s", randomString(16))
+
+		fmt.Printf("Pushing to branch %q\n", branch)
+		if err := r.git.Push(worktree, pushURL, "HEAD:refs/heads/"+branch); err != nil {
+			return err
+		}
+		fmt.Printf("Creating pull request against branch %q\n", r.config.PagesBranch)
+		prURL, err := r.github.CreatePullRequest(r.config.Owner, r.config.GitRepo, "Update index.yaml", branch, r.config.PagesBranch)
+		if err != nil {
+			return err
+		}
+		fmt.Println("Pull request created:", prURL)
+	}
+
+	return nil
 }
 
 func copyFile(srcFile string, dstFile string) error {
