@@ -183,7 +183,9 @@ func (r *Releaser) UpdateIndexFile() (bool, error) {
 				if r.config.PackagesWithIndex {
 					indexBasePath := filepath.Dir(r.config.IndexPath)
 					chartTargetPath := filepath.Join(indexBasePath, filepath.Base(chartPackage))
-					copyFile(chartPackage, chartTargetPath)
+					if err := copyFile(chartPackage, chartTargetPath); err != nil {
+						return false, err
+					}
 				}
 				update = true
 				break
