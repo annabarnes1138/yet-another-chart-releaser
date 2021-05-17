@@ -55,5 +55,7 @@ func init() {
 	uploadCmd.Flags().String("release-name-template", "{{ .Name }}-{{ .Version }}", "Go template for computing release names, using chart metadata")
 	uploadCmd.Flags().String("pages-branch", "gh-pages", "The GitHub pages branch")
 	uploadCmd.Flags().String("remote", "origin", "The Git remote used when creating a local worktree for the GitHub Pages branch")
+	uploadCmd.Flags().Bool("push", false, "Push index.yaml to the GitHub Pages branch (must not be set if --pr is set)")
+	uploadCmd.Flags().Bool("pr", false, "Create a pull request for index.yaml against the GitHub Pages branch (must not be set if --push is set)")
 	uploadCmd.Flags().Bool("packages-with-index", false, "Save a copy of the package files to the GitHub Pages branch")
 }
