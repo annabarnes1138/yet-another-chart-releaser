@@ -117,6 +117,7 @@ func (r *Releaser) UpdateIndexFile() (bool, error) {
 			chartsRepoUrl.Host, chartsRepoUrl.Path)
 	}
 
+	fmt.Printf("Retrieving index file from: %s", indexUrl)
 	resp, err := r.httpClient.Get(indexUrl)
 	if err != nil {
 		return false, err
