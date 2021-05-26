@@ -54,6 +54,7 @@ type GitHub interface {
 
 type HttpClient interface {
 	Get(url string) (*http.Response, error)
+	GetWithToken(url string, token string) (*http.Response, error)
 }
 
 type Git interface {
@@ -75,6 +76,13 @@ func init() {
 
 func (c *DefaultHttpClient) Get(url string) (resp *http.Response, err error) {
 	return http.Get(url)
+}
+
+func (c *DefaultHttpClient) GetWithToken(url string, token string) (resp *http.Response, err error) {
+	req, _ := http.NewRequest("GET", url, nil)
+	req.Header.Add("Authorization", fmt.Sprintf("token %s", token))
+	client := &http.Client{}
+	return client.Do(req)
 }
 
 type Releaser struct {
@@ -109,9 +117,18 @@ func (r *Releaser) UpdateIndexFile() (bool, error) {
 
 	var indexFile *repo.IndexFile
 
-	resp, err := r.httpClient.Get(fmt.Sprintf("%s/index.yaml", r.config.ChartsRepo))
-	if err != nil {
-		return false, err
+	var resp *http.Response
+	var err error
+	if r.config.Token != "" {
+		resp, err = r.httpClient.GetWithToken(fmt.Sprintf("%s/index.yaml", r.config.ChartsRepo), r.config.Token)
+		if err != nil {
+			return false, err
+		}
+	} else {
+		resp, err = r.httpClient.Get(fmt.Sprintf("%s/index.yaml", r.config.ChartsRepo))
+		if err != nil {
+			return false, err
+		}
 	}
 
 	defer resp.Body.Close()
