@@ -111,10 +111,7 @@ func (r *Releaser) UpdateIndexFile() (bool, error) {
 
 	indexUrl := fmt.Sprintf("%s/index.yaml", r.config.ChartsRepo)
 	if r.config.Token != "" {
-		chartsRepoUrl, _ := url.Parse(r.config.ChartsRepo)
-		indexUrl = fmt.Sprintf("%s://%s@%s%s/index.yaml",
-			chartsRepoUrl.Scheme, r.config.Token,
-			chartsRepoUrl.Host, chartsRepoUrl.Path)
+		indexUrl = fmt.Sprintf("%s?token=%s", indexUrl, r.config.Token)
 	}
 
 	fmt.Printf("Retrieving index file from: %s\n", indexUrl)
