@@ -53,6 +53,16 @@ func (m *MockClient) Get(url string) (*http.Response, error) {
 	}
 }
 
+func (m *MockClient) GetWithToken(url string, token string) (*http.Response, error) {
+	if m.statusCode == http.StatusOK {
+		file, _ := os.Open(m.file)
+		reader := bufio.NewReader(file)
+		return &http.Response{StatusCode: http.StatusOK, Body: ioutil.NopCloser(reader)}, nil
+	} else {
+		return &http.Response{StatusCode: http.StatusNotFound, Body: ioutil.NopCloser(nil)}, nil
+	}
+}
+
 func (f *FakeGitHub) CreateRelease(ctx context.Context, input *github.Release) error {
 	f.Called(ctx, input)
 	f.release = input
