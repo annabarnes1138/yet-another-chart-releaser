@@ -109,13 +109,7 @@ func (r *Releaser) UpdateIndexFile() (bool, error) {
 
 	var indexFile *repo.IndexFile
 
-	indexUrl := fmt.Sprintf("%s/index.yaml", r.config.ChartsRepo)
-	if r.config.Token != "" {
-		indexUrl = fmt.Sprintf("%s?token=%s", indexUrl, r.config.Token)
-	}
-
-	fmt.Printf("Retrieving index file from: %s\n", indexUrl)
-	resp, err := r.httpClient.Get(indexUrl)
+	resp, err := r.httpClient.Get(fmt.Sprintf("%s/index.yaml", r.config.ChartsRepo))
 	if err != nil {
 		return false, err
 	}
